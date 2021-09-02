@@ -26,26 +26,16 @@ public class PasswordGenerator {
 
     private static final SecureRandom secureRandom = new SecureRandom();
 
-    public static void main(String[] args) {
-        // Always store a password in char[]?
-        final PasswordGenerator passwordGenerator = new PasswordGenerator();
-        final char[] password = passwordGenerator
-                .generateRandomPassword(32, 2, 2, 2, 2)
-                .toCharArray();
-
-        System.out.println(password);
-    }
-
     // TODO: Place protections on parameter input size
-    public String generateRandomPassword(int length, int lowercase, int upperCase, int digit, int specialChar) {
-        if (length < 8) {
-            throw new IllegalArgumentException("password length must be greater than 8 characters");
+    public String generateRandomPassword(int length, int lowercase, int uppercase, int digit, int specialChar) {
+        if (length < 8 || length > 128) {
+            throw new IllegalArgumentException("password length must be 8 - 128 characters");
         }
         final String password = generateRandomString(LOWERCASE_CHAR, lowercase) +
-                generateRandomString(UPPERCASE_CHAR, upperCase) +
+                generateRandomString(UPPERCASE_CHAR, uppercase) +
                 generateRandomString(DIGIT, digit) +
                 generateRandomString(SPECIAL_CHAR, specialChar) +
-                generateRandomString(PASSWORD_POLICY, length - lowercase - upperCase - digit - specialChar);
+                generateRandomString(PASSWORD_POLICY, length - lowercase - uppercase - digit - specialChar);
 
         return shuffleString(password);
     }
