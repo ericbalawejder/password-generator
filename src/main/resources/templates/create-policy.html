@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Random Password</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container my-3">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <h2>Create Policy</h2>
+            <form th:action="@{/show}" th:object="${password}" method="post">
+                <ul th:if="${#fields.hasErrors('*')}">
+                    <li th:each="error : ${#fields.errors('*')}" th:text="${error}">error</li>
+                </ul>
+                <div class="form-row">
+                    <div class="col-md-6 form-group">
+                        <label>Length</label>
+                        <input type="number" class="form-control" th:field="*{length}">
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>Lowercase</label>
+                        <input type="number" class="form-control" th:field="*{lowercase}">
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>Uppercase</label>
+                        <input type="number" class="form-control" th:field="*{uppercase}">
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>Digit</label>
+                        <input type="number" class="form-control" th:field="*{digit}">
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>Special Characters</label>
+                        <input type="number" class="form-control" th:field="*{specialChar}">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block mt-3">Generate Password</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

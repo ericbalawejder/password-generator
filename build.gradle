@@ -17,6 +17,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web:2.5.4'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:2.5.4'
     testImplementation 'org.springframework.boot:spring-boot-starter-test:2.5.4'
+    implementation 'org.springframework.boot:spring-boot-devtools:2.5.4'
 }
 
 test {
