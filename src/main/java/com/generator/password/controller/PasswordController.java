@@ -3,6 +3,7 @@ package com.generator.password.controller;
 import com.generator.password.entity.PasswordGenerator;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +17,7 @@ public class PasswordController {
         return "create-policy";
     }
 
+    @CrossOrigin("http://localhost:4000")
     @PostMapping("/show")
     public String showPassword(@ModelAttribute("generator") PasswordGenerator generator) {
         return "show-password";
