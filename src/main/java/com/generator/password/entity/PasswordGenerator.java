@@ -1,5 +1,7 @@
 package com.generator.password.entity;
 
+import com.generator.password.exception.PasswordException;
+
 import java.io.Serializable;
 import java.security.SecureRandom;
 import java.util.Arrays;
@@ -29,7 +31,6 @@ public class PasswordGenerator implements Serializable {
     private static final SecureRandom secureRandom = new SecureRandom();
 
     private int length;
-    private int lowercase;
     private int uppercase;
     private int digit;
     private int specialChar;
@@ -38,9 +39,8 @@ public class PasswordGenerator implements Serializable {
     public PasswordGenerator() {
     }
 
-    public PasswordGenerator(int length, int lowercase, int uppercase, int digit, int specialChar) {
+    public PasswordGenerator(int length, int uppercase, int digit, int specialChar) {
         this.length = length;
-        this.lowercase = lowercase;
         this.uppercase = uppercase;
         this.digit = digit;
         this.specialChar = specialChar;
@@ -52,14 +52,6 @@ public class PasswordGenerator implements Serializable {
 
     public void setLength(int length) {
         this.length = length;
-    }
-
-    public int getLowercase() {
-        return lowercase;
-    }
-
-    public void setLowercase(int lowercase) {
-        this.lowercase = lowercase;
     }
 
     public int getUppercase() {
@@ -88,7 +80,7 @@ public class PasswordGenerator implements Serializable {
 
     public String getPassword() {
         return Objects.requireNonNullElseGet(password, () -> generateRandomPassword(
-                this.length, this.lowercase, this.uppercase, this.digit, this.specialChar));
+                this.length, this.uppercase, this.digit, this.specialChar));
     }
 
     public void setPassword(String password) {
@@ -99,7 +91,6 @@ public class PasswordGenerator implements Serializable {
     public String toString() {
         return "PasswordGenerator{" +
                 "length=" + length +
-                ", lowercase=" + lowercase +
                 ", uppercase=" + uppercase +
                 ", digit=" + digit +
                 ", specialChar=" + specialChar +
@@ -107,22 +98,23 @@ public class PasswordGenerator implements Serializable {
                 '}';
     }
 
-    // TODO: Place protections on parameter input size. Use char[].
-    private String generateRandomPassword(int length, int lowercase, int uppercase, int digit, int specialChar) {
+    private String generateRandomPassword(int length, int uppercase, int digit, int specialChar) throws NumberFormatException {
         if (length < 8 || length > 128) {
-            throw new IllegalArgumentException("password length must be 8 - 128 characters");
+            throw new PasswordException("password length must be 8 - 128 characters");
         }
-        final String password = generateRandomString(LOWERCASE_CHAR, lowercase) +
-                generateRandomString(UPPERCASE_CHAR, uppercase) +
+        if ((uppercase + digit + specialChar) > length) {
+            throw new PasswordException("requirement fields exceed password length");
+        }
+        final String password = generateRandomString(UPPERCASE_CHAR, uppercase) +
                 generateRandomString(DIGIT, digit) +
                 generateRandomString(SPECIAL_CHAR, specialChar) +
-                generateRandomString(PASSWORD_POLICY, length - lowercase - uppercase - digit - specialChar);
+                generateRandomString(LOWERCASE_CHAR, length - uppercase - digit - specialChar);
 
         return shuffleString(password);
     }
 
     private String generateRandomString(String alphabet, int size) {
-        if (alphabet == null || alphabet.length() <= 0) throw new IllegalArgumentException("Invalid alphabet.");
+        if (alphabet == null || alphabet.length() <= 0) throw new PasswordException("Invalid alphabet.");
         if (size < 0) throw new IllegalArgumentException("Invalid size.");
 
         return IntStream.range(0, size)

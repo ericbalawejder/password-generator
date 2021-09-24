@@ -12,6 +12,8 @@
     <div class="row">
         <div class="col-md-8 mx-auto">
             <h2>Create Policy</h2>
+            <h6>The default password is lowercase letters. Use the fields to control the minimum
+            set of uppercase characters, digits and special characters.</h6>
             <form th:action="@{/show}" th:object="${password}" method="post">
                 <ul th:if="${#fields.hasErrors('*')}">
                     <li th:each="error : ${#fields.errors('*')}" th:text="${error}">error</li>
@@ -20,10 +22,6 @@
                     <div class="col-md-6 form-group">
                         <label>Length</label>
                         <input type="number" class="form-control" th:field="*{length}">
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label>Lowercase</label>
-                        <input type="number" class="form-control" th:field="*{lowercase}">
                     </div>
                     <div class="col-md-6 form-group">
                         <label>Uppercase</label>
