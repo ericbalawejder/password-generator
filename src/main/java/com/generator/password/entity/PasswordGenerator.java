@@ -98,7 +98,7 @@ public class PasswordGenerator implements Serializable {
                 '}';
     }
 
-    private String generateRandomPassword(int length, int uppercase, int digit, int specialChar) throws NumberFormatException {
+    private String generateRandomPassword(int length, int uppercase, int digit, int specialChar) {
         if (length < 8 || length > 128) {
             throw new PasswordException("password length must be 8 - 128 characters");
         }

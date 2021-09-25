@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class PasswordExceptionHandler {
 
-    @ExceptionHandler
+    @ExceptionHandler(value = PasswordException.class)
     public ResponseEntity<PasswordErrorResponse> handleException(PasswordException exc) {
         PasswordErrorResponse error = new PasswordErrorResponse();
 
@@ -21,7 +21,7 @@ public class PasswordExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(value = PasswordException.class)
     public ResponseEntity<PasswordErrorResponse> handleException(Exception exc) {
         PasswordErrorResponse error = new PasswordErrorResponse();
 
