@@ -114,8 +114,8 @@ public class PasswordGenerator implements Serializable {
     }
 
     private String generateRandomString(String alphabet, int size) {
-        if (alphabet == null || alphabet.length() <= 0) throw new PasswordException("Invalid alphabet.");
-        if (size < 0) throw new IllegalArgumentException("Invalid size.");
+        if (alphabet == null || alphabet.length() <= 0) throw new PasswordException("invalid alphabet");
+        if (size < 0) throw new IllegalArgumentException("invalid field size");
 
         return IntStream.range(0, size)
                 .map(i -> secureRandom.nextInt(alphabet.length()))
