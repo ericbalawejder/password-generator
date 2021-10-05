@@ -1,5 +1,5 @@
-### Password Generator
-Create a policy to generate a random password. Built with Spring Boot.
+## Password Generator
+Create a random password to match a given policy. Built with Spring Boot.
 
 ### How to run:
 To run locally:
@@ -7,13 +7,22 @@ To run locally:
 $ ./gradlew clean build
 $ ./gradlew bootRun
 ```
-visit:<br>
-http://localhost:8080/password
+visit: http://localhost:8080/password
+
+To run the tests:
+```
+$ ./gradlew test
+```
 
 ### Deployment process:
 Using a [Digital Ocean Droplet](https://www.digitalocean.com/products/droplets/):
 
+##### Create a subdomain
+Point your domain's A/AAAA records at your droplet's IP address(es).<br>
+Name: `droplet`
+
 [Install Java](https://www.digitalocean.com/community/tutorials/how-to-install-java-with-apt-on-ubuntu-20-04)
+on the droplet.
 ```
 $ sudo apt install openjdk-11-jre-headless
 ```
@@ -30,14 +39,14 @@ Verify:
 ```
 $ javac -version
 ```
-Setting the JAVA_HOME Environment Variable.
+Setting the `JAVA_HOME` Environment Variable.
 ```
 $ sudo update-alternatives --config java
 
 There is only one alternative in link group java (providing /usr/bin/java): /usr/lib/jvm/java-11-openjdk-amd64/bin/java
 Nothing to configure.
 ```
-Copy the path from your preferred installation. Then open /etc/environment:
+Copy the path from your preferred installation. Then open `/etc/environment`:
 ```
 $ sudo nano /etc/environment
 ```
@@ -56,7 +65,7 @@ $ echo $JAVA_HOME
 ```
 Other users will need to execute the command source /etc/environment or log out and log back in to apply this setting.
 
-
+##### Web server
 Install [Caddy](https://caddyserver.com/docs/install)
 ```
 $ sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https
@@ -71,7 +80,7 @@ as a preinstalled [service](https://marketplace.digitalocean.com/apps/caddy).
 
 Configure caddy file:
 ```
-$ nano /etc/caddy/Caddyfile
+$ sudo nano /etc/caddy/Caddyfile
 ```
 ```
 # The Caddyfile is an easy way to configure your Caddy web server.
@@ -95,19 +104,30 @@ droplet.ericbalawejder.com {
 # Refer to the Caddy docs for more information:
 # https://caddyserver.com/docs/caddyfile
 ```
-It will keep your certificates renewed while it serves your sites, and it even redirects HTTP requests to HTTPS.<br>
+Caddy will keep your certificates renewed while it serves your sites, and it even redirects HTTP requests to HTTPS.<br>
 Certs are located: `$ /var/lib/caddy/.local/share/caddy/`
 
-Point your domain's A/AAAA records at your droplet's IP address(es).
-droplet
-Visit: droplet.ericbalawejder.com/password
+Visit droplet.ericbalawejder.com/password to verify installation.
 
-Clone spring boot app onto droplet
+##### Clone spring boot app onto droplet
 ```
+$ cd home/
 $ git clone https://github.com/ericbalawejder/password-generator.git
 ```
-Edit PasswordController.java `@CrossOrigin()`
-password.html url: `https://droplet.ericbalawejder.com/show`
+Edit the `@CrossOrigin()` annotation arguments in `PasswordController.java` on the `showPassword()` method.
+We will be accessing the app from `"https://ericbalawejder.com"` and from the droplet machine
+`"https://droplet.ericbalawejder.com"` for testing. This is to allow access to the application 
+running on our droplet from a foreign server or else we will get `blocked by CORS policy` error.
+```java
+    @CrossOrigin(origins = {"https://ericbalawejder.com", "https://droplet.ericbalawejder.com"})
+    @PostMapping(path = "/show", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PasswordResponse> showPassword(
+            @ModelAttribute("generator") PasswordGenerator generator) {
+        final PasswordResponse passwordResponse = new PasswordResponse(generator);
+
+        return new ResponseEntity<>(passwordResponse, HttpStatus.OK);
+    }
+```
 
 #### Systemd service
 The application needs to be packaged as a jar file. Gradle can handle that for us by running the following
@@ -128,10 +148,9 @@ Check that the user was created:
 $ getent passwd | grep password-generator-user
 password-generator-user:x:1000:1000::/home/password-generator-user:/bin/sh
 ```
-We are changing the owner of the deployed file (via CI / CD or direct upload) to be the just created 
-user: password-generator-user.
+We are changing the owner of the deployed file to be the just created user: password-generator-user.
 ```
-$ sudo chown password-generator-user:password-generator-user password-generator/build/libs/password-generator-0.0.1-SNAPSHOT.jar
+$ sudo chown password-generator-user:password-generator-user /home/password-generator/build/libs/password-generator-0.0.1-SNAPSHOT.jar
 ```
 As a last part, we are allowing that user to read and execute the deployed file, but totally withdraw 
 access to the deployed jar from the group or anyone else on the system.
@@ -141,8 +160,8 @@ $ sudo chmod 500 /home/password-generator/build/libs/password-generator-0.0.1-SN
 This way access to the system is restricted if someone is able to access the file system through our 
 deployed application.
 
-For the systemd service setup, we need to create a script named `password-generator.service` using the 
-following example and put it in /etc/systemd/system directory:
+For the systemd service setup, we need to create a script named `password-generator.service` and put
+it in `/etc/systemd/system` directory:
 
 ```
 $ nano etc/systemd/system/password-generator.service
@@ -184,18 +203,11 @@ $ systemctl daemon-reload
 ```
 
 #### TODO:
-* password-generator.service has default permissions of 644?<br>
-* Permissions of jar should be 500. Changed to 744
-
-* CrossOrigin("...")
-
 * Logs
 
 * Return character array and use jQuery to iterate through array for display.
 
 * Make field hidden until response is returned.
-
-* Response codes?
 
 * Check for known bad passwords using:
   * https://haveibeenpwned.com/Passwords
