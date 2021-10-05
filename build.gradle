@@ -16,12 +16,18 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter:2.5.5'
     implementation 'org.springframework.boot:spring-boot-starter-web:2.5.5'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:2.5.5'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test:2.5.5'
     implementation 'org.springframework.boot:spring-boot-devtools:2.5.5'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:2.5.5'
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.21.0'
 }
 
 test {
     useJUnitPlatform()
+    testLogging {
+        exceptionFormat = 'short'
+        showStandardStreams = true
+        events = ["passed", "failed", "skipped"]
+    }
 }
 
 jar {
