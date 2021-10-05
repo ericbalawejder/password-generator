@@ -117,7 +117,8 @@ $ git clone https://github.com/ericbalawejder/password-generator.git
 Edit the `@CrossOrigin()` annotation arguments in `PasswordController.java` on the `showPassword()` method.
 We will be accessing the app from `"https://ericbalawejder.com"` and from the droplet machine
 `"https://droplet.ericbalawejder.com"` for testing. This is to allow access to the application 
-running on our droplet from a foreign server or else we will get `blocked by CORS policy` error.
+running on our droplet with resources not hosted by its domain. Without this we will get `blocked by CORS policy` 
+error.
 ```java
     @CrossOrigin(origins = {"https://ericbalawejder.com", "https://droplet.ericbalawejder.com"})
     @PostMapping(path = "/show", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -128,8 +129,20 @@ running on our droplet from a foreign server or else we will get `blocked by COR
         return new ResponseEntity<>(passwordResponse, HttpStatus.OK);
     }
 ```
+Build the application:
+```
+$ cd password-generator
+$ ./gradlew clean build
+```
+The application can now be run using:
+```
+$ ./gradlew bootRun
+```
 
 #### Systemd service
+There are many times we want an application to continue running once it is started. We could consider a 
+cron job or script, but there is an easier and more reliable solution, [systemd](https://www.freedesktop.org/wiki/Software/systemd/). 
+
 The application needs to be packaged as a jar file. Gradle can handle that for us by running the following
 command in the project root directory:
 ```
@@ -164,7 +177,7 @@ For the systemd service setup, we need to create a script named `password-genera
 it in `/etc/systemd/system` directory:
 
 ```
-$ nano etc/systemd/system/password-generator.service
+$ sudo nano etc/systemd/system/password-generator.service
 ```
 
 ```
@@ -183,6 +196,9 @@ RestartSec=5
 [Install]
 WantedBy=multi-user.target
 ```
+The `ExecStart` field contains the fully qualified path for Java to run the executable.
+`/usr/bin/java` is the location of the Java installation `-jar` and the `/path/to/the/executable.jar`
+
 To enable our configuration, we can execute:
 ```
 $ sudo systemctl enable password-generator.service
@@ -201,6 +217,9 @@ If changes are made to the service file, we will get a warning to reload the dae
 ```
 $ systemctl daemon-reload
 ```
+
+#### Front end form
+[Source code](https://github.com/ericbalawejder/ericbalawejder.github.io/blob/master/password.html)
 
 #### TODO:
 * Logs
