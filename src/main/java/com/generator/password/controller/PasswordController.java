@@ -1,7 +1,7 @@
 package com.generator.password.controller;
 
 import com.generator.password.entity.PasswordGenerator;
-import com.generator.password.response.PasswordSuccessResponse;
+import com.generator.password.response.PasswordResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,18 +23,11 @@ public class PasswordController {
 
     @CrossOrigin("http://localhost:4000")
     @PostMapping(path = "/show", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PasswordSuccessResponse> showPassword(
+    public ResponseEntity<PasswordResponse> showPassword(
             @ModelAttribute("generator") PasswordGenerator generator) {
-        final PasswordSuccessResponse success = new PasswordSuccessResponse(generator);
+        final PasswordResponse success = new PasswordResponse(generator);
 
         return new ResponseEntity<>(success, HttpStatus.OK);
     }
-
-    /* For Thymeleaf form
-    @CrossOrigin("http://localhost:4000")
-    @PostMapping("/show")
-    public String showPassword(@ModelAttribute("generator") PasswordGenerator generator) {
-        return "show-password";
-    }*/
 
 }

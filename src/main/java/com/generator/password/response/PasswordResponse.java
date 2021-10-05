@@ -2,7 +2,7 @@ package com.generator.password.response;
 
 import com.generator.password.entity.PasswordGenerator;
 
-public class PasswordSuccessResponse {
+public class PasswordResponse {
 
     private final int length;
     private final int uppercase;
@@ -10,7 +10,7 @@ public class PasswordSuccessResponse {
     private final int specialChar;
     private final String password;
 
-    public PasswordSuccessResponse(PasswordGenerator generator) {
+    public PasswordResponse(PasswordGenerator generator) {
         this.length = generator.getLength();
         this.uppercase = generator.getUppercase();
         this.digit = generator.getDigit();
