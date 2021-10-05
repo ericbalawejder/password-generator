@@ -30,9 +30,9 @@ public class PasswordExceptionHandler {
     public ResponseEntity<PasswordErrorResponse> handleAll(Exception exc) {
         final String message = "form fields can not be null";
         final PasswordErrorResponse error = new PasswordErrorResponse(
-                HttpStatus.INTERNAL_SERVER_ERROR.value(), message, System.currentTimeMillis());
+                HttpStatus.BAD_REQUEST.value(), message, System.currentTimeMillis());
 
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
 }
