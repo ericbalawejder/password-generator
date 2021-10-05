@@ -1,10 +1,10 @@
 ### Password Generator
-Create a policy to generate a random password. Built with Spring Boot and Thymeleaf.
+Create a policy to generate a random password. Built with Spring Boot.
 
 ### How to run:
 To run locally:
 ```
-$ cd password-generator
+$ ./gradlew clean build
 $ ./gradlew bootRun
 ```
 visit:<br>
@@ -13,10 +13,49 @@ http://localhost:8080/password
 ### Deployment process:
 Using a [Digital Ocean Droplet](https://www.digitalocean.com/products/droplets/):
 
-Install Java
+[Install Java](https://www.digitalocean.com/community/tutorials/how-to-install-java-with-apt-on-ubuntu-20-04)
 ```
-$ apt install openjdk-11-jre-headless
+$ sudo apt install openjdk-11-jre-headless
 ```
+Verify
+```
+$ java -version
+```
+You may need the Java Development Kit (JDK) in addition to the JRE in order to compile and run some specific 
+Java-based software. To install the JDK, execute the following command, which will also install the JRE:
+```
+$ sudo apt install default-jre
+```
+Verify:
+```
+$ javac -version
+```
+Setting the JAVA_HOME Environment Variable.
+```
+$ sudo update-alternatives --config java
+
+There is only one alternative in link group java (providing /usr/bin/java): /usr/lib/jvm/java-11-openjdk-amd64/bin/java
+Nothing to configure.
+```
+Copy the path from your preferred installation. Then open /etc/environment:
+```
+$ sudo nano /etc/environment
+```
+At the end of this file, add the following line, making sure to replace the highlighted path with your own copied 
+path, but do not include the `bin/` portion of the path:
+```
+JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64"
+```
+Now reload this file to apply the changes to your current session:
+```
+$ source /etc/environment
+```
+Verify:
+```
+$ echo $JAVA_HOME
+```
+Other users will need to execute the command source /etc/environment or log out and log back in to apply this setting.
+
 
 Install [Caddy](https://caddyserver.com/docs/install)
 ```
@@ -68,16 +107,13 @@ Clone spring boot app onto droplet
 $ git clone https://github.com/ericbalawejder/password-generator.git
 ```
 Edit PasswordController.java `@CrossOrigin()`
-
-password.html url:
-url: https://droplet.ericbalawejder.com/show
-
+password.html url: `https://droplet.ericbalawejder.com/show`
 
 #### Systemd service
 The application needs to be packaged as a jar file. Gradle can handle that for us by running the following
 command in the project root directory:
 ```
-$ ./gradlew bootJar
+$ ./gradlew clean build
 ```
 Running the application can now be achieved directly from the jar:
 ```
@@ -87,6 +123,11 @@ Create a user to run the service:
 ```
 $ sudo useradd password-generator-user
 ```
+Check that the user was created:
+```
+$ getent passwd | grep password-generator-user
+password-generator-user:x:1000:1000::/home/password-generator-user:/bin/sh
+```
 We are changing the owner of the deployed file (via CI / CD or direct upload) to be the just created 
 user: password-generator-user.
 ```
@@ -95,7 +136,7 @@ $ sudo chown password-generator-user:password-generator-user password-generator/
 As a last part, we are allowing that user to read and execute the deployed file, but totally withdraw 
 access to the deployed jar from the group or anyone else on the system.
 ```
-$ sudo chmod 500 password-generator/build/libs/password-generator-0.0.1-SNAPSHOT.jar
+$ sudo chmod 500 /home/password-generator/build/libs/password-generator-0.0.1-SNAPSHOT.jar
 ```
 This way access to the system is restricted if someone is able to access the file system through our 
 deployed application.
@@ -103,15 +144,19 @@ deployed application.
 For the systemd service setup, we need to create a script named `password-generator.service` using the 
 following example and put it in /etc/systemd/system directory:
 
-nano etc/systemd/system/password-generator.service
+```
+$ nano etc/systemd/system/password-generator.service
+```
+
 ```
 [Unit]
 Description=A Spring Boot Application for Password Generation
 After=syslog.target
 
 [Service]
+Type=simple
 User=password-generator-user
-ExecStart=/root/password-generator/build/libs/password-generator-0.0.1-SNAPSHOT.jar
+ExecStart=/usr/bin/java -jar /home/password-generator/build/libs/password-generator-0.0.1-SNAPSHOT.jar
 SuccessExitStatus=143
 Restart=always
 RestartSec=5
@@ -126,34 +171,33 @@ Created symlink /etc/systemd/system/multi-user.target.wants/password-generator.s
 ```
 We should be able to check the status of our application with the following command:
 ```
-$ sudo systemctl status password-generator.service
+$ sudo systemctl status password-generator
 ```
-
-
-password-generator.service has default permissions of 644. Changed them to 744...tried 777?
+To stop and start the service:
 ```
-$ /etc/systemd/system# chmod 744 password-generator.service
+$ sudo systemctl stop password-generator
+$ sudo systemctl start password-generator
 ```
-
-
-
 If changes are made to the service file, we will get a warning to reload the daemon.
 ```
 $ systemctl daemon-reload
 ```
 
-
 #### TODO:
-return character array
-use jQuery to iterate through array for display
+* password-generator.service has default permissions of 644?<br>
+* Permissions of jar should be 500. Changed to 744
 
-Place protections on policy:
-handle spring boot exceptions in controller
-backend
-form
+* CrossOrigin("...")
 
-Explicit special symbols in generator algorithm
-place instructions on form of /password
+* Logs
 
-escape html special characters for display
-html and css for form design
+* Return character array and use jQuery to iterate through array for display.
+
+* Make field hidden until response is returned.
+
+* Response codes?
+
+* Check for known bad passwords using:
+  * https://haveibeenpwned.com/Passwords
+
+* [Handle form field BindException properly](https://stackoverflow.com/questions/48786173/spring-boot-handle-exception-wrapped-with-bindexception).
