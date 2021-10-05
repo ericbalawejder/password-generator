@@ -22,12 +22,13 @@ public class PasswordController {
     }
 
     @CrossOrigin("http://localhost:4000")
+    //@CrossOrigin(origins = {"https://ericbalawejder.com", "https://droplet.ericbalawejder.com"})
     @PostMapping(path = "/show", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PasswordResponse> showPassword(
             @ModelAttribute("generator") PasswordGenerator generator) {
-        final PasswordResponse success = new PasswordResponse(generator);
+        final PasswordResponse passwordResponse = new PasswordResponse(generator);
 
-        return new ResponseEntity<>(success, HttpStatus.OK);
+        return new ResponseEntity<>(passwordResponse, HttpStatus.OK);
     }
 
 }
