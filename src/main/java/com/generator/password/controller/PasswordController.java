@@ -21,8 +21,8 @@ public class PasswordController {
         return "create-policy";
     }
 
-    @CrossOrigin("http://localhost:4000")
-    //@CrossOrigin(origins = {"https://ericbalawejder.com", "https://droplet.ericbalawejder.com"})
+    //@CrossOrigin("http://localhost:4000")
+    @CrossOrigin(origins = {"https://ericbalawejder.com", "https://droplet.ericbalawejder.com"})
     @PostMapping(path = "/show", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PasswordResponse> showPassword(
             @ModelAttribute("generator") PasswordGenerator generator) {
