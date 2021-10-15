@@ -28,7 +28,7 @@ public class PasswordExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<PasswordErrorResponse> handleAll(Exception exc) {
-        final String message = "form fields can not be null";
+        final String message = "invalid input";
         final PasswordErrorResponse error = new PasswordErrorResponse(
                 HttpStatus.BAD_REQUEST.value(), message, System.currentTimeMillis());
 
