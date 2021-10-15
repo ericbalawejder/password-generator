@@ -1,31 +1,18 @@
 #!/bin/bash
 
-#ssh droplet "cd /home/password-generator; git pull; ./gradlew build; chown password-generator-user:password-generator-user /home/password-generator/build/libs/password-generator-0.0.1-SNAPSHOT.jar; chmod 500 /home/password-generator/build/libs/password-generator-0.0.1-SNAPSHOT.jar; systemctl restart password-generator"
+# Gradle commands, upon completion, cause the shell session to exit. The commands
+# must be in one long string. This behavior happens in a HereDoc and a shell script.
+# echo 'starting gradle'
+# ./gradlew clean build
+# echo 'finished' <- never gets executed
 
 jar='/home/password-generator/build/libs/password-generator-0.0.1-SNAPSHOT.jar'
-app_root='/home/password-generator'
-build='./gradlew build'
-change_owner='chown password-generator-user:password-generator-user'
-change_permission='chmod 500'
-restart_systemd='systemctl restart password-generator'
+owner='password-generator-user'
 
-#ssh root@192.168.1.1 'bash -s' < script.sh
-
-
-#ssh droplet << EOF
-  #cd $app_root;
-  #git pull;
-  #$build;
-  #$change_permission $jar;
-  #$restart_systemd;
-#EOF
-
-ssh droplet << EOF
-  set +x;
-  cd /home/energy-server;
-  pwd;
-  git pull;
-  ./gradlew build
-  $change_permission $jar;
-  echo 'finished!';
-EOF
+ssh droplet "cd /home/password-generator; \
+git pull; \
+./gradlew clean build; \
+chown $owner:$owner $jar; \
+chmod 500 $jar; \
+systemctl restart password-generator; \
+echo 'finished deployment!'"

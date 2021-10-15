@@ -1,6 +1,9 @@
 ## Password Generator
 Create a random password to match a given policy. Built with Spring Boot.
 
+The generator allows you to explicitly set the number of special characters, numbers
+and case rather than providing a ratio of them in the password.
+
 ### How to run:
 To run locally:
 ```
@@ -63,7 +66,7 @@ Verify:
 ```
 $ echo $JAVA_HOME
 ```
-Other users will need to execute the command source /etc/environment or log out and log back in to apply this setting.
+Other users will need to execute the command `$ source /etc/environment` or log out and log back in to apply this setting.
 
 ##### Web server
 Install [Caddy](https://caddyserver.com/docs/install)
@@ -114,11 +117,9 @@ Visit droplet.ericbalawejder.com/password to verify installation.
 $ cd home/
 $ git clone https://github.com/ericbalawejder/password-generator.git
 ```
-Edit the `@CrossOrigin()` annotation arguments in `PasswordController.java` on the `showPassword()` method.
-We will be accessing the app from `"https://ericbalawejder.com"` and from the droplet machine
-`"https://droplet.ericbalawejder.com"` for testing. This is to allow access to the application 
-running on our droplet with resources not hosted by its domain. Without this we will get `blocked by CORS policy` 
-error.
+The `@CrossOrigin()` annotation arguments in `PasswordController.java` on the `showPassword()` method
+must list the two origins below. This is to allow access to the application running on our droplet with 
+resources not hosted by its domain. Without this we will get `blocked by CORS policy` error.
 ```java
     @CrossOrigin(origins = {"https://ericbalawejder.com", "https://droplet.ericbalawejder.com"})
     @PostMapping(path = "/show", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -197,7 +198,8 @@ RestartSec=5
 WantedBy=multi-user.target
 ```
 The `ExecStart` field contains the fully qualified path for Java to run the executable.
-`/usr/bin/java` is the location of the Java installation `-jar` and the `/path/to/the/executable.jar`
+`/usr/bin/java` is the location of the Java installation. `-jar` to run the executable 
+and then the `/path/to/the/executable.jar`
 
 To enable our configuration, we can execute:
 ```
@@ -218,17 +220,26 @@ If changes are made to the service file, we will get a warning to reload the dae
 $ systemctl daemon-reload
 ```
 
-#### Front end form
+#### Front end
+The application is accessed from https://ericbalawejder.com/password/ <br>
 [Source code](https://github.com/ericbalawejder/ericbalawejder.github.io/blob/master/password.html)
 
 #### TODO:
+* CircleCI
+
 * Logs
 
 * Return character array and use jQuery to iterate through array for display.
 
 * Make field hidden until response is returned.
 
-* Check for known bad passwords using:
+* Check for known bad passwords using [haveibeenpwned](https://haveibeenpwned.com/APIDocs/v3) API:
   * https://haveibeenpwned.com/Passwords
 
-* [Handle form field BindException properly](https://stackoverflow.com/questions/48786173/spring-boot-handle-exception-wrapped-with-bindexception).
+* [Handle form field BindException properly](https://stackoverflow.com/questions/48786173/spring-boot-handle-exception-wrapped-with-bindexception). 
+  * Integer overflow from form throws the same BindException as null fields.
+
+* deploy script exits after gradle command.
+  * [ssh - run muliple commands](https://stackoverflow.com/questions/4412238/what-is-the-cleanest-way-to-ssh-and-run-multiple-commands-in-bash)
+  * ssh droplet 'bash -s' < deploy.sh or cat deploy.sh | ssh droplet
+  * bash [heredoc](https://tldp.org/LDP/abs/html/here-docs.html)
