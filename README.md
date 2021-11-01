@@ -17,10 +17,10 @@ To run the tests:
 $ ./gradlew test
 ```
 
-### Deployment process:
+## Deployment process:
 Using a [Digital Ocean Droplet](https://www.digitalocean.com/products/droplets/):
 
-##### Create a subdomain
+#### Create a subdomain
 Point your domain's A/AAAA records at your droplet's IP address(es).<br>
 Name: `droplet`
 
@@ -68,7 +68,7 @@ $ echo $JAVA_HOME
 ```
 Other users will need to execute the command `$ source /etc/environment` or log out and log back in to apply this setting.
 
-##### Web server
+#### Web server
 Install [Caddy](https://caddyserver.com/docs/install)
 ```
 $ sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https
@@ -110,9 +110,9 @@ droplet.ericbalawejder.com {
 Caddy will keep your certificates renewed while it serves your sites, and it even redirects HTTP requests to HTTPS.<br>
 Certs are located: `$ /var/lib/caddy/.local/share/caddy/`
 
-Visit droplet.ericbalawejder.com/password to verify installation.
+Visit [droplet.ericbalawejder.com/password](droplet.ericbalawejder.com/password) to verify installation.
 
-##### Clone spring boot app onto droplet
+#### Clone spring boot app onto droplet
 ```
 $ cd home/
 $ git clone https://github.com/ericbalawejder/password-generator.git
@@ -224,8 +224,15 @@ $ systemctl daemon-reload
 The application is accessed from https://ericbalawejder.com/password/ <br>
 [Source code](https://github.com/ericbalawejder/ericbalawejder.github.io/blob/master/password.html)
 
+#### Deploying changes
+The script 
+[`deploy.sh`](https://github.com/ericbalawejder/password-generator/blob/main/deploy.sh) uses ssh to 
+sync changes and permissions on the droplet from github.com.
+
 #### TODO:
 * CircleCI
+
+* Configuration management tool
 
 * Logs
 
